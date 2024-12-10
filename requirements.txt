@@ -1,0 +1,5 @@
+Flask
+langchain-google-genai
+numpy
+pandas
+tavily-python
