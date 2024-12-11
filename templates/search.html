@@ -5,26 +5,25 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='search_style.css') }}">
 </head>
 
 <body>
 	<h1>Your search query: {{ query }}</h1>
-	<div>
-		<h2>Relevant links: </h2>
-		<ul>
-			{% for doc in docs %}
-			<li>
-				<a href="{{ doc.metadata['source'] }}">
-					{{ doc.metadata["title"] }}
-				</a>
-			</li>
-			{% endfor %}
-		</ul>
-	</div>
-	<div>
-		<h2>AI Summary:</h2>
-		<!-- AI summary as HTML -->
-		{{ ai_summary | safe }}
+	<div id="site">
+		<div id="links">
+			<h2>Relevant links: </h2>
+			<ul>
+				{% for doc in docs %}
+				<li><a href="{{ doc.metadata['source'] }}">{{ doc.metadata["title"] }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div id="summary">
+			<h2>AI Summary:</h2>
+			<!-- AI summary as HTML -->
+			{{ ai_summary | safe }}
+		</div>
 	</div>
 </body>
 
