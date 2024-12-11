@@ -8,7 +8,20 @@
 </head>
 
 <body>
-	<h1>{{ query }}</h1>
+	<h1>Your search query: {{ query }}</h1>
+	<div>
+		<h2>Relevant links: </h2>
+		<ul>
+			{% for doc in unique_docs %}
+			<li>{{ doc.metadata["source"] }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div>
+		<h2>AI Summary:</h2>
+		<!-- AI summary as HTML -->
+		{{ ai_summary }}
+	</div>
 </body>
 
 </html>

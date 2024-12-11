@@ -4,9 +4,17 @@ from langchain_community.vectorstores import Chroma
 # from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.retrievers import TavilySearchAPIRetriever
-from env_api import set_api
+from dotenv import load_dotenv
 
-set_api() # init the API variables
+from langchain.retrievers.multi_query import MultiQueryRetriever
+from langchain_core.documents import Document
+from langchain_core.prompts import ChatPromptTemplate
+
+load_dotenv(".env")
+import os 
+
+os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
+os.environ["TAVILY_API_KEY"] = os.getenv("TAVILY_API_KEY")
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-flash-8b"
@@ -14,5 +22,41 @@ llm = ChatGoogleGenerativeAI(
 
 retriever = TavilySearchAPIRetriever(k = 5)
 
-def multi_query_search(query: str) -> str:
-    return ""
+# def ai_summary(docs: list[Document]) -> str:
+#     content = ""
+#     for doc in docs:
+#         content += doc.page_content
+    
+#     answer = llm.invoke(prompt.invoke({"question": }))
+    
+
+def multi_query_search(query: str) -> tuple[list[Document], str]:
+    """_summary_
+
+    Args:
+        query (str): user query
+
+    Returns:
+        tuple[list[Document], str]: Tuple of relevant docs and AI summary.
+    """
+    retriever_from_llm = MultiQueryRetriever.from_llm(
+        retriever=retriever, llm=llm
+    )
+    
+    unique_docs = retriever_from_llm.invoke(query)
+    
+    content = ""
+    for doc in unique_docs:
+        content += doc.page_content
+        
+    prompt =  ChatPromptTemplate.from_messages([
+        ("system", """
+            You are a helpful assistant. 
+            Your task is to help the user summarize information f the relevant content they provide.
+            Please return the result as HTML, using headings from H3 to lower.
+         """),
+        ("user", "{content}")
+    ]).invoke({"question": query, "content": content}).to_string()
+    
+    ai_answer = llm.invoke(prompt).content
+    return (unique_docs, ai_answer)
