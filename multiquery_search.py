@@ -20,7 +20,7 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-flash-8b"
 )
 
-retriever = TavilySearchAPIRetriever(k = 5)
+retriever = TavilySearchAPIRetriever(k = 3)
 
 # def ai_summary(docs: list[Document]) -> str:
 #     content = ""
@@ -52,11 +52,16 @@ def multi_query_search(query: str) -> tuple[list[Document], str]:
     prompt =  ChatPromptTemplate.from_messages([
         ("system", """
             You are a helpful assistant. 
-            Your task is to help the user summarize information f the relevant content they provide.
-            Please return the result as HTML, using headings from H3 to lower.
+            Your task is to help the user summarize information about {question} with the relevant content they provide.
+            Your answer will be used with other HTML tags, so please don't include scripts,
+            and use headings from H3 to lower.
+            
          """),
         ("user", "{content}")
     ]).invoke({"question": query, "content": content}).to_string()
     
     ai_answer = llm.invoke(prompt).content
+    for doc in unique_docs:
+        print(doc.metadata)
+
     return (unique_docs, ai_answer)

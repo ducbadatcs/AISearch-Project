@@ -12,15 +12,19 @@
 	<div>
 		<h2>Relevant links: </h2>
 		<ul>
-			{% for doc in unique_docs %}
-			<li>{{ doc.metadata["source"] }}</li>
+			{% for doc in docs %}
+			<li>
+				<a href="{{ doc.metadata['source'] }}">
+					{{ doc.metadata["title"] }}
+				</a>
+			</li>
 			{% endfor %}
 		</ul>
 	</div>
 	<div>
 		<h2>AI Summary:</h2>
 		<!-- AI summary as HTML -->
-		{{ ai_summary }}
+		{{ ai_summary | safe }}
 	</div>
 </body>
 
